@@ -1,0 +1,8 @@
+---
+- hosts: all
+  gather_facts: no
+  tasks:
+    - name: Wall o pings
+      command: ping 8.8.8.8
+      async: 5
+      poll: 0
