@@ -44,21 +44,32 @@ resource "aws_security_group" "allow_egress_all" {
     }
 }
 
-resource "aws_instance" "ddosaas" {
-    count = 20
+resource "aws_spot_instance_request" "spot_instance" {
+    count = 25
     ami = "${data.aws_ami.ubuntu.id}"
-    instance_type = "t2.nano"
+    instance_type = "t3a.nano"
     vpc_security_group_ids = ["${aws_security_group.allow_ssh.id}", "${aws_security_group.allow_egress_all.id}"]
     key_name = "AWSDefault"
-    subnet_id = "subnet-c905e6b2" # Hard-coded subnet
-
     tags = {
         Name = "ddosaas${count.index}"
     }
 }
 
-resource "null_resource" "provision_vms" {
-    provisioner "local-exec" {
-        command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu --private-key ~/.ssh/AWSDefault -i '${join(",", aws_instance.ddosaas.*.public_ip)},' -e 'ansible_python_interpreter=/usr/bin/python3' provision.yml"
-    }
-}
+#resource "aws_instance" "ddosaas" {
+#    count = 20
+#    ami = "${data.aws_ami.ubuntu.id}"
+#    instance_type = "t2.nano"
+#    vpc_security_group_ids = ["${aws_security_group.allow_ssh.id}", "${aws_security_group.allow_egress_all.id}"]
+#    key_name = "AWSDefault"
+#    subnet_id = "subnet-c905e6b2" # Hard-coded subnet
+#
+#    tags = {
+#        Name = "ddosaas${count.index}"
+#    }
+#}
+
+#resource "null_resource" "provision_vms" {
+#    provisioner "local-exec" {
+#        command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu --private-key ~/.ssh/AWSDefault -i '${join(",", aws_instance.ddosaas.*.public_ip)},' -e 'ansible_python_interpreter=/usr/bin/python3' provision.yml"
+#    }
+#}
